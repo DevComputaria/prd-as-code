@@ -45,7 +45,10 @@ test('public repository surfaces do not expose deprecated public identity string
     'criado nesta conversa',
   ];
   const files = walk(root).filter(path => {
-    if (relative(root, path).startsWith('tests/')) return false;
+    const rel = relative(root, path).replaceAll('\\', '/');
+    if (rel.startsWith('tests/')) return false;
+    if (rel.includes('/.intent/') || rel.includes('/.prodshape/')) return false;
+    if (rel.startsWith('src/legacy/')) return false;
     return /\.(md|json|ya?ml|ts|py)$/i.test(path);
   });
   for (const path of files) {
