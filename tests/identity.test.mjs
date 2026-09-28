@@ -49,6 +49,7 @@ test('public repository surfaces do not expose deprecated public identity string
     'CHANGELOG.md',
     'LICENSE',
     'package.json',
+    'package-lock.json',
     'docs',
     'framework',
     'templates',
