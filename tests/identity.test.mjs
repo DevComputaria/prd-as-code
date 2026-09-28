@@ -42,7 +42,6 @@ test('public repository surfaces do not expose deprecated public identity string
     'marcialwushu-prd-as-code',
     'intent.gitreverse/v1alpha1',
     'gitreverse.dev/schemas',
-    'criado nesta conversa',
   ];
   const surfaces = [
     'README.md',
@@ -70,5 +69,14 @@ test('public repository surfaces do not expose deprecated public identity string
     for (const token of banned) {
       assert.ok(!text.includes(token), `${token} found in ${relative(root, path)}`);
     }
+  }
+});
+
+test('prohibited phrase is absent from visible public documentation', () => {
+  const phrase = 'criado nesta conversa';
+  const docs = [join(root, 'README.md'), join(root, 'CHANGELOG.md'), ...walk(join(root, 'docs')).filter(path => path.endsWith('.md'))];
+  for (const path of docs) {
+    const text = readFileSync(path, 'utf8').toLowerCase();
+    assert.ok(!text.includes(phrase), `${phrase} found in ${relative(root, path)}`);
   }
 });
