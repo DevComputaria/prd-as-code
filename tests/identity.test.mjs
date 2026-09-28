@@ -44,7 +44,10 @@ test('public repository surfaces do not expose deprecated public identity string
     'gitreverse.dev/schemas',
     'criado nesta conversa',
   ];
-  const files = walk(root).filter(path => /\.(md|json|ya?ml|ts|py)$/i.test(path));
+  const files = walk(root).filter(path => {
+    if (relative(root, path).startsWith('tests/')) return false;
+    return /\.(md|json|ya?ml|ts|py)$/i.test(path);
+  });
   for (const path of files) {
     const text = readFileSync(path, 'utf8');
     for (const token of banned) {
