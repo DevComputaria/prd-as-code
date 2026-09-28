@@ -47,6 +47,7 @@ test('public repository surfaces do not expose deprecated public identity string
   const files = walk(root).filter(path => {
     const rel = relative(root, path).replaceAll('\\', '/');
     if (rel.startsWith('tests/')) return false;
+    if (rel.startsWith('.intent/') || rel.startsWith('.prodshape/')) return false;
     if (rel.includes('/.intent/') || rel.includes('/.prodshape/')) return false;
     if (rel.startsWith('src/legacy/')) return false;
     return /\.(md|json|ya?ml|ts|py)$/i.test(path);
