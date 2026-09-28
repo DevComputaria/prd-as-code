@@ -1,4 +1,4 @@
-apiVersion: intent.gitreverse/v1alpha1
+apiVersion: prd.devcomputaria/v1alpha1
 kind: Decision
 metadata:
   id: DEC-001

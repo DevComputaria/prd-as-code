@@ -9,7 +9,7 @@ Os schemas publicados aqui são contratos próprios, inspirados nos metamodelos 
 ## Envelope
 
 ```yaml
-apiVersion: intent.gitreverse/v1alpha1
+apiVersion: prd.devcomputaria/v1alpha1
 kind: Requirement
 metadata:
   id: REQ-001

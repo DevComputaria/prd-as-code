@@ -10,7 +10,7 @@ prd -C ../produto-antigo validate
 prd -C ../produto-antigo legacy citations check
 ```
 
-A migração reconhece apenas o formato do protótipo independente v0 desta conversa. Não reconhece ProductShape oficial.
+A migração reconhece apenas o formato do protótipo independente v0 deste repositório. Não reconhece ProductShape oficial.
 
 Cria intent.config.yaml e intent-product/; preserva prodshape.json, product/, .prodshape/ e documentos com citações antigas. Os IDs são mantidos e os digests antigos são registrados no mapa `.intent/migrations/prodshape-v0.json`. Algoritmos diferentes não produzem necessariamente o mesmo digest.
 

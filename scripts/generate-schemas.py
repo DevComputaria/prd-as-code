@@ -23,12 +23,12 @@ specs['Behavior']=obj({'profile':const('behavior-core/v1'),'given':arr(s,1),'whe
 specs['Evidence']=obj({'profile':const('evidence/v1'),'subjectRef':ident,'subjectDigest':{'type':'string','pattern':'^sha256:[a-f0-9]{64}$'},'commit':s,'producer':s,'executedAt':s,'outcome':{'enum':['passed','failed','inconclusive']},'resultPath':s},['profile','subjectRef','subjectDigest','commit','producer','executedAt','outcome'])
 specs['OpenQuestion']=obj({'profile':const('product-core/v1'),'question':s,'blocking':{'type':'boolean'},'suggestions':arr(s)},['profile','question','blocking'])
 meta=obj({'id':ident,'title':s,'status':{'enum':['draft','active','deprecated']}})
-def artifact(kind,spec):return obj({'apiVersion':const('intent.gitreverse/v1alpha1'),'kind':const(kind),'metadata':meta,'spec':spec,'links':arr(link)},['apiVersion','kind','metadata','spec'])
-umbrella={'$schema':'http://json-schema.org/draft-07/schema#','$id':'https://gitreverse.dev/schemas/intent/v1alpha1/artifact','$defs':{'expression':expr},'oneOf':[artifact(k,v) for k,v in specs.items()]}
+def artifact(kind,spec):return obj({'apiVersion':const('prd.devcomputaria/v1alpha1'),'kind':const(kind),'metadata':meta,'spec':spec,'links':arr(link)},['apiVersion','kind','metadata','spec'])
+umbrella={'$schema':'http://json-schema.org/draft-07/schema#','$id':'https://prd.devcomputaria/schemas/artifact','$defs':{'expression':expr},'oneOf':[artifact(k,v) for k,v in specs.items()]}
 # IDs are identifiers, not remotely fetched schemas; validation always loads local files.
 (r/'artifact.schema.json').write_text(json.dumps(umbrella,ensure_ascii=False,indent=2)+'\n')
 for k,v in specs.items():
  schema={'$schema':'http://json-schema.org/draft-07/schema#','$defs':{'expression':expr},**artifact(k,v)}
  (r/(k+'.schema.json')).write_text(json.dumps(schema,ensure_ascii=False,indent=2)+'\n')
-config=obj({'apiVersion':const('intent.gitreverse/v1alpha1'),'name':s,'language':{'enum':['pt','en']},'product':s,'policies':obj({'requireCitations':{'type':'boolean'}})})
+config=obj({'apiVersion':const('prd.devcomputaria/v1alpha1'),'name':s,'language':{'enum':['pt','en']},'product':s,'policies':obj({'requireCitations':{'type':'boolean'}})})
 (r/'config.schema.json').write_text(json.dumps(config,indent=2)+'\n')

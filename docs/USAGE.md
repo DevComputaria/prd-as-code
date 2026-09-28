@@ -39,7 +39,7 @@ O lock e estados transitórios indicados no `.gitignore` não devem ser commitad
 Todo YAML começa com o envelope comum. Este é um requisito mínimo válido:
 
 ```yaml
-apiVersion: intent.gitreverse/v1alpha1
+apiVersion: prd.devcomputaria/v1alpha1
 kind: Requirement
 metadata:
   id: REQ-TRANSFER-001

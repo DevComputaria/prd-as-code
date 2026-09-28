@@ -1,4 +1,4 @@
-apiVersion: intent.gitreverse/v1alpha1
+apiVersion: prd.devcomputaria/v1alpha1
 kind: Term
 metadata:
   id: TERM-001

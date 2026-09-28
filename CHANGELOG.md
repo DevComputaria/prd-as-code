@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Renomeada a ferramenta para PRD as a Code, com pacote `@marcialwushu/prd-as-code` e executável `prd`.
+- Renomeada a ferramenta para PRD as a Code, com pacote `@devcomputaria/prd-as-code` e executável `prd`.
 
 ## 0.2.0-alpha.1
 
