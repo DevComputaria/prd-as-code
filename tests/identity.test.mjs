@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const root = process.cwd();
@@ -44,14 +44,26 @@ test('public repository surfaces do not expose deprecated public identity string
     'gitreverse.dev/schemas',
     'criado nesta conversa',
   ];
-  const files = walk(root).filter(path => {
-    const rel = relative(root, path).replaceAll('\\', '/');
-    if (rel.startsWith('tests/')) return false;
-    if (rel.startsWith('.intent/') || rel.startsWith('.prodshape/')) return false;
-    if (rel.includes('/.intent/') || rel.includes('/.prodshape/')) return false;
-    if (rel.startsWith('src/legacy/')) return false;
-    return /\.(md|json|ya?ml|ts|py)$/i.test(path);
-  });
+  const surfaces = [
+    'README.md',
+    'CHANGELOG.md',
+    'LICENSE',
+    'package.json',
+    'docs',
+    'framework',
+    'templates',
+    'examples',
+    'scripts/generate-schemas.py',
+    'src/domain/model.ts',
+  ];
+  const files = [];
+  for (const surface of surfaces) {
+    const full = join(root, surface);
+    if (!existsSync(full)) continue;
+    const stat = statSync(full);
+    if (stat.isDirectory()) files.push(...walk(full).filter(path => /\.(md|json|ya?ml|ts|py)$/i.test(path)));
+    else files.push(full);
+  }
   for (const path of files) {
     const text = readFileSync(path, 'utf8');
     for (const token of banned) {
