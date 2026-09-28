@@ -1,0 +1,17 @@
+name: Product as Code
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Install the supplied CLI archive as a pinned dev dependency before enabling this workflow.
+      - run: npm exec --no -- prd validate --strict --citations --json
+      - run: npm exec --no -- prd test --require-tests --require-bound-scenarios --json

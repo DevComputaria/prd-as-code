@@ -1,0 +1,9 @@
+{
+  "yaml.schemas": {
+    "./framework/schemas/artifact.schema.json": [
+      "product/**/*.yaml",
+      "product/**/*.yml"
+    ],
+    "./framework/schemas/config.schema.json": "intent.config.yaml"
+  }
+}

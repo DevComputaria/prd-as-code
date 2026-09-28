@@ -1,0 +1,22 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: Requirement
+metadata:
+  id: REQ-001
+  title: Avaliar conta e saldo
+  status: active
+spec:
+  profile: reqif-core/v1
+  category: functional
+  statement: Neste exemplo didático, a transferência é elegível quando a conta está
+    ativa e possui saldo suficiente.
+  acceptance:
+  - Conta inativa resulta em CONTA_INATIVA.
+  - Conta ativa sem saldo suficiente resulta em SALDO_INSUFICIENTE.
+  - Conta ativa com saldo suficiente resulta em ELEGIVEL.
+  attributes:
+    priority: high
+links:
+- relation: governed-by
+  target: BR-001
+- relation: realized-by
+  target: PROC-001#avaliar

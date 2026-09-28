@@ -1,0 +1,65 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: Decision
+metadata:
+  id: DEC-001
+  title: Avaliar elegibilidade
+  status: active
+spec:
+  profile: dmn-table/v1
+  hitPolicy: UNIQUE
+  inputs:
+  - name: contaAtiva
+    type: boolean
+  - name: saldoSuficiente
+    type: boolean
+  output:
+    name: resultado
+    type: string
+    values:
+    - ELEGIVEL
+    - CONTA_INATIVA
+    - SALDO_INSUFICIENTE
+  rules:
+  - id: DROW-001
+    when:
+      contaAtiva: false
+    then: CONTA_INATIVA
+  - id: DROW-002
+    when:
+      contaAtiva: true
+      saldoSuficiente: false
+    then: SALDO_INSUFICIENTE
+  - id: DROW-003
+    when:
+      contaAtiva: true
+      saldoSuficiente: true
+    then: ELEGIVEL
+  cases:
+  - id: CASE-001
+    scenario: SCN-001
+    input:
+      contaAtiva: true
+      saldoSuficiente: true
+    expected: ELEGIVEL
+  - id: CASE-002
+    scenario: SCN-002
+    input:
+      contaAtiva: false
+      saldoSuficiente: true
+    expected: CONTA_INATIVA
+  - id: CASE-003
+    scenario: SCN-003
+    input:
+      contaAtiva: true
+      saldoSuficiente: false
+    expected: SALDO_INSUFICIENTE
+  - id: CASE-004
+    input:
+      contaAtiva: false
+      saldoSuficiente: false
+    expected: CONTA_INATIVA
+links:
+- relation: satisfies
+  target: REQ-001
+- relation: governed-by
+  target: BR-001

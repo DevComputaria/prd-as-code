@@ -1,0 +1,25 @@
+{
+  "name": "@marcialwushu/prd-as-code",
+  "version": "0.2.0-alpha.1",
+  "description": "Product as Code: vocabulary, rules, requirements, decisions, processes and verifiable behavior.",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=22" },
+  "bin": { "prd": "dist/interfaces/cli/main.js" },
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist", "src", "framework", "templates", "examples", "docs", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit && node scripts/check-boundaries.mjs",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "demo": "npm run build && node scripts/demo.mjs",
+    "prepack": "npm run build",
+    "intent:validate": "node dist/interfaces/cli/main.js -C examples/transfer validate --strict",
+    "intent:test": "node dist/interfaces/cli/main.js -C examples/transfer test --require-tests"
+  },
+  "dependencies": {
+    "commander": "14.0.2", "yaml": "2.9.1", "ajv": "8.17.1",
+    "@cucumber/gherkin": "32.2.0", "@cucumber/messages": "27.2.0"
+  },
+  "devDependencies": { "@types/node": "22.19.15", "typescript": "5.9.3" }
+}

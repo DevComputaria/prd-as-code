@@ -1,0 +1,18 @@
+trigger:
+  - main
+pool:
+  vmImage: ubuntu-latest
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '24.x'
+  - script: npm ci
+    displayName: Install pinned dependencies
+  - script: npm run check
+    displayName: Type and architecture checks
+  - script: npm test
+    displayName: Unit, integration and legacy tests
+  - script: npm run intent:validate && npm run intent:test
+    displayName: Validate product example
+  - script: npm pack
+    displayName: Package CLI

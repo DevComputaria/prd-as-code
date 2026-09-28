@@ -1,0 +1,24 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: BusinessRule
+metadata:
+  id: BR-001
+  title: Conta de origem ativa
+  status: active
+spec:
+  profile: sbvr-core/v1
+  statement: Toda transferência elegível deve ter conta de origem ativa.
+  formulation:
+    modality: obligation
+    forEach:
+      variable: t
+      conceptRef: TERM-001
+    assertion:
+      implies:
+        if:
+          factRef: FACT-001
+          bindings:
+            transfer: t
+        then:
+          factRef: FACT-002
+          bindings:
+            transfer: t

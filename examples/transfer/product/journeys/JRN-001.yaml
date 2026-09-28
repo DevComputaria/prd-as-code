@@ -1,0 +1,14 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: Journey
+metadata:
+  id: JRN-001
+  title: Preparar transferência
+  status: active
+spec:
+  profile: product-core/v1
+  description: O cliente informa a transferência e verifica se pode prosseguir.
+links:
+- relation: contains
+  target: UC-001
+- relation: performed-by
+  target: ACT-001

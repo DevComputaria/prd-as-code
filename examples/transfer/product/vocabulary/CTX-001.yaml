@@ -1,0 +1,12 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: BoundedContext
+metadata:
+  id: CTX-001
+  title: Elegibilidade
+  status: active
+spec:
+  profile: product-core/v1
+  description: Contexto limitado à elegibilidade; não executa débito nem liquidação.
+links:
+- relation: contains
+  target: TERM-001

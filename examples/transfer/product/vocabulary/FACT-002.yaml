@@ -1,0 +1,12 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: FactType
+metadata:
+  id: FACT-002
+  title: Transferência tem conta de origem ativa
+  status: active
+spec:
+  profile: sbvr-core/v1
+  reading: transferência tem conta de origem ativa
+  roles:
+  - name: transfer
+    conceptRef: TERM-001

@@ -1,0 +1,24 @@
+# language: en
+@process_PROC-001 @requirement_REQ-001 @rule_BR-001
+Feature: Evaluate transfer eligibility
+
+  @scenario_SCN-001
+  Scenario: Active account with sufficient balance
+    Given the source account is active
+    And has sufficient balance
+    When eligibility is evaluated
+    Then the result is "ELEGIVEL"
+
+  @scenario_SCN-002
+  Scenario: Inactive account
+    Given the source account is inactive
+    And has sufficient balance
+    When eligibility is evaluated
+    Then the result is "CONTA_INATIVA"
+
+  @scenario_SCN-003
+  Scenario: Insufficient balance
+    Given the source account is active
+    And has insufficient balance
+    When eligibility is evaluated
+    Then the result is "SALDO_INSUFICIENTE"

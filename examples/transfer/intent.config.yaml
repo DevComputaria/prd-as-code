@@ -1,0 +1,6 @@
+apiVersion: intent.gitreverse/v1alpha1
+name: Transfer
+language: pt
+product: product
+policies:
+  requireCitations: false

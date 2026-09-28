@@ -1,0 +1,9 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: Actor
+metadata:
+  id: ACT-001
+  title: Cliente
+  status: active
+spec:
+  profile: product-core/v1
+  description: Solicita a avaliação de elegibilidade de uma transferência.

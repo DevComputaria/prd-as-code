@@ -1,0 +1,117 @@
+{
+  "version": "0.2.0-alpha.1",
+  "language": "intent.gitreverse/v1alpha1",
+  "xml": false,
+  "profiles": {
+    "product-core/v1": {
+      "implemented": [
+        "actors",
+        "journeys",
+        "use cases",
+        "bounded contexts",
+        "typed links",
+        "blocking questions"
+      ]
+    },
+    "sbvr-core/v1": {
+      "implemented": [
+        "terms and designations",
+        "typed fact roles",
+        "one universally quantified variable",
+        "recursive all/any/not/implies formulations",
+        "reference and binding type checks"
+      ],
+      "unsupported": [
+        "modal theorem proving",
+        "rule execution",
+        "multiple quantifiers",
+        "navigation expressions",
+        "automatic prose equivalence"
+      ]
+    },
+    "reqif-core/v1": {
+      "implemented": [
+        "requirements",
+        "functional/quality/constraint categories",
+        "typed scalar attributes",
+        "parent hierarchy",
+        "external identifiers"
+      ],
+      "unsupported": [
+        "ReqIF interchange",
+        "ReqIF conformance",
+        "XHTML"
+      ]
+    },
+    "dmn-table/v1": {
+      "implemented": [
+        "UNIQUE tables",
+        "typed equality conditions",
+        "omitted conditions as wildcard",
+        "typed outputs",
+        "finite domain exhaustiveness up to 4096 combinations",
+        "scenario-linked cases"
+      ],
+      "unsupported": [
+        "FEEL",
+        "other hit policies",
+        "general DMN conformance"
+      ]
+    },
+    "process-basic/v1": {
+      "implemented": [
+        "start/end/task/businessRuleTask/exclusiveGateway",
+        "node/flow references",
+        "reachability",
+        "acyclic profile",
+        "scenario links"
+      ],
+      "unsupported": [
+        "BPMN execution",
+        "parallelism",
+        "timers",
+        "compensation",
+        "deadlock proof",
+        "condition evaluation",
+        "BPMN conformance"
+      ]
+    },
+    "gherkin/v1": {
+      "implemented": [
+        "official parser",
+        "Portuguese/English scaffolds",
+        "scenario identity tags",
+        "reference validation",
+        "decision-case bindings"
+      ],
+      "unsupported": [
+        "step execution",
+        "Scenario Outline row bindings",
+        "automatic process inference",
+        "coverage proof from prose"
+      ]
+    },
+    "governance/v1": {
+      "implemented": [
+        "staging",
+        "exact-byte baseline",
+        "approval digest",
+        "journal rollback",
+        "current/stale/tampered/unresolved citations",
+        "candidate decision test gate on check/approve/apply"
+      ],
+      "unsupported": [
+        "authenticated reviewer identities",
+        "global filesystem atomicity",
+        "power-loss durability"
+      ]
+    }
+  },
+  "future": [
+    "MCP server",
+    "authenticated PR approval provider",
+    "scenario step runner",
+    "RDF/OWL exports",
+    "decision differential runner"
+  ]
+}

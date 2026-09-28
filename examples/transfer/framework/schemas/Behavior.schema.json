@@ -1,0 +1,213 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "expression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "factRef": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9]*-[A-Za-z0-9][A-Za-z0-9-]*$"
+            },
+            "bindings": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "factRef",
+            "bindings"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "not": {
+              "$ref": "#/$defs/expression"
+            }
+          },
+          "required": [
+            "not"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "all": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/expression"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "all"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "any": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/expression"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "any"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "implies": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "$ref": "#/$defs/expression"
+                },
+                "then": {
+                  "$ref": "#/$defs/expression"
+                }
+              },
+              "required": [
+                "if",
+                "then"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "implies"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "const": "intent.gitreverse/v1alpha1"
+    },
+    "kind": {
+      "const": "Behavior"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]*-[A-Za-z0-9][A-Za-z0-9-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "active",
+            "deprecated"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "spec": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "const": "behavior-core/v1"
+        },
+        "given": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "when": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "then": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "profile",
+        "given",
+        "when",
+        "then"
+      ],
+      "additionalProperties": false
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "relation": {
+            "enum": [
+              "uses",
+              "depends-on",
+              "governed-by",
+              "performed-by",
+              "defines",
+              "satisfies",
+              "verifies",
+              "contains",
+              "related-to",
+              "realized-by",
+              "derived-from"
+            ]
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]*-[A-Za-z0-9][A-Za-z0-9-]*(#[A-Za-z0-9_-]+)?$"
+          }
+        },
+        "required": [
+          "relation",
+          "target"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "additionalProperties": false
+}

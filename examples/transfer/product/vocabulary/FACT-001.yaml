@@ -1,0 +1,12 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: FactType
+metadata:
+  id: FACT-001
+  title: Transferência está elegível
+  status: active
+spec:
+  profile: sbvr-core/v1
+  reading: transferência está elegível
+  roles:
+  - name: transfer
+    conceptRef: TERM-001

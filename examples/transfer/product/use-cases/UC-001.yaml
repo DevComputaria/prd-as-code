@@ -1,0 +1,14 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: UseCase
+metadata:
+  id: UC-001
+  title: Consultar elegibilidade
+  status: active
+spec:
+  profile: product-core/v1
+  description: O cliente solicita uma avaliação e recebe um resultado observável.
+links:
+- relation: uses
+  target: PROC-001
+- relation: satisfies
+  target: REQ-001

@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "const": "intent.gitreverse/v1alpha1"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "language": {
+      "enum": [
+        "pt",
+        "en"
+      ]
+    },
+    "product": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policies": {
+      "type": "object",
+      "properties": {
+        "requireCitations": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "requireCitations"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "apiVersion",
+    "name",
+    "language",
+    "product",
+    "policies"
+  ],
+  "additionalProperties": false
+}

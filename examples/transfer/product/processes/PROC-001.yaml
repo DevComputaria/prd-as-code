@@ -1,0 +1,30 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: Process
+metadata:
+  id: PROC-001
+  title: Avaliar transferência
+  status: active
+spec:
+  profile: process-basic/v1
+  nodes:
+  - id: inicio
+    type: startEvent
+  - id: avaliar
+    type: businessRuleTask
+    decisionRef: DEC-001
+  - id: fim
+    type: endEvent
+  flows:
+  - id: FLOW-001
+    from: inicio
+    to: avaliar
+  - id: FLOW-002
+    from: avaliar
+    to: fim
+  scenarios:
+  - SCN-001
+  - SCN-002
+  - SCN-003
+links:
+- relation: performed-by
+  target: ACT-001

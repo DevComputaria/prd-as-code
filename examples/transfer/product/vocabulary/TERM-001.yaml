@@ -1,0 +1,12 @@
+apiVersion: intent.gitreverse/v1alpha1
+kind: Term
+metadata:
+  id: TERM-001
+  title: Transferência
+  status: active
+spec:
+  profile: sbvr-core/v1
+  definition: Solicitação de movimentação de valor entre contas.
+  designations:
+  - Transferência
+  - Transfer
