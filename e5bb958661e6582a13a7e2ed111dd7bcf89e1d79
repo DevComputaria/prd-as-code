@@ -1,0 +1,66 @@
+Notas técnicas — PRD as Code
+============================
+
+Commit documentado: e5bb958
+Título: feat: Add product eligibility evaluation workflow and related templates
+Data do registro: 2026-09-27
+
+Resumo do trabalho
+==================
+
+- Implementação do framework PRD as a Code em TypeScript.
+- CLI `prd` para inicialização, validação, consulta e análise de impacto.
+- Modelo versionado em YAML, Markdown e Gherkin.
+- Schemas locais, perfis de linguagem, relações tipadas e canonicalização.
+- Avaliação e análise de tabelas de decisão com política `UNIQUE`.
+- Validação estrutural de processos e rastreabilidade entre requisitos,
+  regras, decisões, processos e cenários.
+- Citações com snapshots, classificação de estado e atualização explícita.
+- Propostas de mudança com baseline, diff, aprovação, lock, journal e recuperação.
+- Kit opcional de integração com Copilot, templates e workflow de CI.
+- Exemplo integrado de avaliação de elegibilidade de transferência.
+- Migração aditiva do formato legado, mantendo a implementação v0 isolada.
+
+Arquitetura registrada
+======================
+
+O projeto usa um monólito modular com as seguintes fronteiras:
+- `domain`: modelo, invariantes, digests, decisões e grafo, sem I/O;
+- `application`: casos de uso, citações, propostas e recuperação;
+- `compiler`: YAML, Markdown, Gherkin, schemas e semântica;
+- `infrastructure`: filesystem, scaffold e migração;
+- `interfaces/cli`: comandos, saída JSON e códigos de saída.
+
+O domínio e a aplicação não devem depender de Commander, YAML, Ajv, filesystem
+ou do legado. Novos adaptadores devem reutilizar os casos de uso existentes.
+
+Testes e verificações
+=====================
+
+- `npm run check`: passou; TypeScript e fronteiras domain/application válidos.
+- `npm test`: passou; 50 testes, 50 aprovados e 0 falhas.
+- Cobertura funcional verificada: compiler, schemas, referências, digests,
+  decisões finitas, processos, Gherkin, citações, propostas, recuperação,
+  migração, CLI e templates Copilot.
+- A validação do exemplo integrado e a instalação empacotada foram verificadas
+  anteriormente conforme `docs/VERIFICATION.md`.
+- `git diff --check`: passou sem erros de whitespace.
+
+Pontos de trabalho
+==================
+
+- Adicionar testes de propriedade e análise incremental.
+- Ampliar inventário de citações por documento.
+- Implementar evidências reais de CI e distinguir testes do modelo de testes da aplicação.
+- Avaliar servidor MCP read-only e aprovação autenticada por pull request.
+- Definir semântica e fixtures antes de adicionar FEEL, SBVR avançado ou perfis
+  de processos mais expressivos.
+- Manter a documentação sincronizada com `framework/capabilities.json`.
+- Investigar as 4 vulnerabilidades moderadas reportadas pelo `npm ci` antes de publicar.
+
+Limitações conhecidas
+=====================
+
+Esta versão não fornece conformidade OMG completa, motor BPMN, FEEL, execução de
+step definitions Gherkin, servidor MCP ou autenticação de revisores. O campo
+`--by` registra o revisor informado, mas não autentica sua identidade.
