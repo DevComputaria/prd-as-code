@@ -1,8 +1,12 @@
 # PRD as a Code
 
+[![CI](https://github.com/DevComputaria/prd-as-code/actions/workflows/ci.yml/badge.svg)](https://github.com/DevComputaria/prd-as-code/actions/workflows/ci.yml)
+
 **Product Requirements Document as Code em YAML, Markdown e Gherkin.** Framework TypeScript e CLI `prd` para vocabulário, regras, requisitos, decisões, processos e evidências versionadas.
 
-Versão **0.2.0-alpha.1**. Um monólito modular, distribuído como um pacote npm. Este projeto evolui o protótipo independente criado nesta conversa; não é o ProductShape original e não declara compatibilidade com seu formato.
+> Status: **alpha** · CLI local · pacote npm **ainda não publicado** (`@devcomputaria/prd-as-code`).
+
+Versão **0.2.0-alpha.1**. Um monólito modular, distribuído como um pacote npm. Este projeto evolui um protótipo independente anterior; não é o ProductShape original e não declara compatibilidade com seu formato.
 
 ## Começar
 
@@ -43,7 +47,7 @@ projeto de desenvolvimento.
 Sem instalação global, execute `node dist/interfaces/cli/main.js` a partir deste repositório. O pacote não foi publicado no npm. Para instalar em outro projeto, use o arquivo `.tgz` fornecido ou gere um com `npm pack`; instale esse arquivo como dependência de desenvolvimento e versione o lockfile.
 
 ```sh
-npm install --save-dev /caminho/marcialwushu-prd-as-code-0.2.0-alpha.1.tgz
+npm install --save-dev /caminho/devcomputaria-prd-as-code-0.2.0-alpha.1.tgz
 npm exec --no -- prd validate --strict
 ```
 

@@ -1,4 +1,4 @@
-export const API_VERSION = 'intent.gitreverse/v1alpha1';
+export const API_VERSION = 'prd.devcomputaria/v1alpha1';
 export const PREFIX = {
   Actor: 'ACT', Journey: 'JRN', UseCase: 'UC', Term: 'TERM', BoundedContext: 'CTX',
   FactType: 'FACT', BusinessRule: 'BR', Requirement: 'REQ', Decision: 'DEC',

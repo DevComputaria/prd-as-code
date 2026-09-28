@@ -1,6 +1,6 @@
 # Estrutura refatorada
 
-Nome: PRD as a Code. Executável: `prd`. Pacote único: `@marcialwushu/prd-as-code`.
+Nome: PRD as a Code. Executável: `prd`. Pacote único: `@devcomputaria/prd-as-code`.
 
 ## Mapa rápido
 

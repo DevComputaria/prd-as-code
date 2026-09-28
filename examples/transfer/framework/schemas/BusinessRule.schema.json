@@ -99,7 +99,7 @@
   "type": "object",
   "properties": {
     "apiVersion": {
-      "const": "intent.gitreverse/v1alpha1"
+      "const": "prd.devcomputaria/v1alpha1"
     },
     "kind": {
       "const": "BusinessRule"

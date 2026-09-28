@@ -1,4 +1,4 @@
-apiVersion: intent.gitreverse/v1alpha1
+apiVersion: prd.devcomputaria/v1alpha1
 kind: UseCase
 metadata:
   id: UC-001

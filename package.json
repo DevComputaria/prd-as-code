@@ -1,5 +1,5 @@
 {
-  "name": "@marcialwushu/prd-as-code",
+  "name": "@devcomputaria/prd-as-code",
   "version": "0.2.0-alpha.1",
   "description": "Product as Code: vocabulary, rules, requirements, decisions, processes and verifiable behavior.",
   "type": "module",

@@ -1,6 +1,6 @@
 {
   "version": "0.2.0-alpha.1",
-  "language": "intent.gitreverse/v1alpha1",
+  "language": "prd.devcomputaria/v1alpha1",
   "xml": false,
   "profiles": {
     "product-core/v1": {
