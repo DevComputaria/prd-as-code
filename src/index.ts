@@ -7,3 +7,8 @@ export * from './application/product-service.js';
 export { createCompiler } from './compiler/compile.js';
 export { createWorkspace } from './infrastructure/filesystem/workspace.js';
 export { services } from './bootstrap.js';
+export * from './application/ports/decision-runtime.js';
+export * from './application/decision-conformance.js';
+export * from './infrastructure/reference/reference-decision-runtime.js';
+export * from './infrastructure/opa/rego-generator.js';
+export * from './infrastructure/opa/opa-decision-runtime.js';
