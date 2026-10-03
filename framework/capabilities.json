@@ -50,7 +50,9 @@
         "omitted conditions as wildcard",
         "typed outputs",
         "finite domain exhaustiveness up to 4096 combinations",
-        "scenario-linked cases"
+        "scenario-linked cases",
+        "reference runtime conformance contract",
+        "optional OPA/Rego adapter for declared decision cases"
       ],
       "unsupported": [
         "FEEL",
@@ -112,6 +114,7 @@
     "authenticated PR approval provider",
     "scenario step runner",
     "RDF/OWL exports",
-    "decision differential runner"
+    "external fact resolver conformance runner",
+    "historical decision differential runner"
   ]
 }
