@@ -11,6 +11,9 @@ import { graph, mermaid } from '../../domain/graph.js';
 import { IntentError } from '../../domain/model.js';
 import { evaluateDecision, analyzeDecision } from '../../domain/decisions.js';
 import type { DecisionSpec } from '../../domain/decisions.js';
+import { conformDecision } from '../../application/decision-conformance.js';
+import { ReferenceDecisionRuntime } from '../../infrastructure/reference/reference-decision-runtime.js';
+import { OpaDecisionRuntime } from '../../infrastructure/opa/opa-decision-runtime.js';
 const cli = new Command().name('prd').description('PRD as a Code').version('0.2.0-alpha.1')
   .option('-C, --root <directory>', 'product directory or a child directory', '.')
   .option('--json', 'machine-readable output').showHelpAfterError().showSuggestionAfterError().exitOverride();
@@ -43,6 +46,16 @@ cli.command('test').description('Execute typed decision cases; report unbound Gh
 const decision = cli.command('decision').description('Evaluate supported decision tables');
 decision.command('evaluate').argument('<id>').requiredOption('--input <json>', 'typed input object').action((id, opts) => { const a = service().load().artifacts.find(s => s.artifact.metadata.id === id && s.artifact.kind === 'Decision'); if (!a) throw new IntentError('UNKNOWN_DECISION', id); out(evaluateDecision(a.artifact.spec as unknown as DecisionSpec, JSON.parse(opts.input))); });
 decision.command('analyze').argument('<id>').action(id => { const a = service().load().artifacts.find(s => s.artifact.metadata.id === id && s.artifact.kind === 'Decision'); if (!a) throw new IntentError('UNKNOWN_DECISION', id); const result = analyzeDecision(a.artifact.spec as unknown as DecisionSpec); out(result); if (result.status !== 'valid') process.exitCode = 1; });
+const conformance = cli.command('conformance').description('Compare executable decision runtimes with PRD as a Code reference semantics');
+conformance.command('decision').argument('<id>').addOption(new Option('--runtime <runtime>').choices(['reference', 'opa']).default('reference'))
+  .action(async (id, opts) => {
+    const a = service().load().artifacts.find(s => s.artifact.metadata.id === id && s.artifact.kind === 'Decision');
+    if (!a) throw new IntentError('UNKNOWN_DECISION', id);
+    const runtime = opts.runtime === 'opa' ? new OpaDecisionRuntime() : new ReferenceDecisionRuntime();
+    const result = await conformDecision(id, a.artifact.spec as unknown as DecisionSpec, runtime);
+    out(result, `${result.passed ? '✓' : '✗'} ${id} on ${result.runtime}: ${result.matched}/${result.cases.length} cases conform`);
+    if (!result.passed) process.exitCode = 1;
+  });
 cli.command('cite').argument('<id>').option('--into <file.md>', 'append to supporting document').action((id, opts) => { const s = service(); if (opts.into) out(s.citeInto(id, opts.into)); else { const block = s.cite(id); out({ block }, block.trimEnd()); } });
 const citations = cli.command('citations').description('Verify current/stale/tampered/unresolved native citations');
 citations.command('check').action(() => { const r = service().citations(); out(r); if (!r.valid) process.exitCode = 1; });
