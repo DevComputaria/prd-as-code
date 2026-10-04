@@ -39,10 +39,10 @@ jobs:
           version: 1.4.2
       - run: npm ci
       - run: npm run opa:generate
-      - name: Verify generated Rego is committed
+      - name: Verify generated OPA artifacts are committed
         run: |
-          git diff --exit-code -- opa/policies
-          test -z "$(git ls-files --others --exclude-standard opa/policies)"
+          git diff --exit-code -- opa
+          test -z "$(git ls-files --others --exclude-standard opa)"
       - run: npm run opa:check
       - run: npm run opa:test
       - run: npm run opa:server:test

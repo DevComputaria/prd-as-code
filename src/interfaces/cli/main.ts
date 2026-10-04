@@ -48,12 +48,30 @@ decision.command('evaluate').argument('<id>').requiredOption('--input <json>', '
 decision.command('analyze').argument('<id>').action(id => { const a = service().load().artifacts.find(s => s.artifact.metadata.id === id && s.artifact.kind === 'Decision'); if (!a) throw new IntentError('UNKNOWN_DECISION', id); const result = analyzeDecision(a.artifact.spec as unknown as DecisionSpec); out(result); if (result.status !== 'valid') process.exitCode = 1; });
 const conformance = cli.command('conformance').description('Compare executable decision runtimes with PRD as a Code reference semantics');
 conformance.command('decision').argument('<id>').addOption(new Option('--runtime <runtime>').choices(['reference', 'opa']).default('reference'))
+  .option('--parity', 'also compare invalid input, gap, and overlap error contracts')
+  .option('--policy <rego>', 'evaluate an exact generated Rego file (OPA runtime only)')
   .action(async (id, opts) => {
     const a = service().load().artifacts.find(s => s.artifact.metadata.id === id && s.artifact.kind === 'Decision');
     if (!a) throw new IntentError('UNKNOWN_DECISION', id);
-    const runtime = opts.runtime === 'opa' ? new OpaDecisionRuntime() : new ReferenceDecisionRuntime();
-    const result = await conformDecision(id, a.artifact.spec as unknown as DecisionSpec, runtime);
-    out(result, `${result.passed ? '✓' : '✗'} ${id} on ${result.runtime}: ${result.matched}/${result.cases.length} cases conform`);
+    if (opts.policy && opts.runtime !== 'opa') {
+      throw new IntentError('USAGE_ERROR', '--policy requires --runtime opa.');
+    }
+    const runtime = opts.runtime === 'opa'
+      ? new OpaDecisionRuntime(
+        undefined,
+        opts.policy ? resolve(opts.policy) : undefined,
+        undefined,
+        opts.policy ? { decisionId: id, spec: a.artifact.spec as unknown as DecisionSpec } : undefined,
+      )
+      : new ReferenceDecisionRuntime();
+    const result = await conformDecision(
+      id,
+      a.artifact.spec as unknown as DecisionSpec,
+      runtime,
+      { parity: Boolean(opts.parity) },
+    );
+    const version = result.runtimeVersion ? ` ${result.runtimeVersion}` : '';
+    out(result, `${result.passed ? '✓' : '✗'} ${id} on ${result.runtime}${version}: ${result.matched}/${result.cases.length} cases conform`);
     if (!result.passed) process.exitCode = 1;
   });
 cli.command('cite').argument('<id>').option('--into <file.md>', 'append to supporting document').action((id, opts) => { const s = service(); if (opts.into) out(s.citeInto(id, opts.into)); else { const block = s.cite(id); out({ block }, block.trimEnd()); } });

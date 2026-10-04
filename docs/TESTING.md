@@ -12,7 +12,8 @@
 | `npm test` | regressão automatizada do CLI, compilador e domínio | execução de uma aplicação externa |
 | `prd validate --strict` | schemas, referências e invariantes dos perfis | conformidade OMG completa |
 | `prd test` | resultados dos casos de decisões tipadas | execução dos passos Gherkin |
-| `prd conformance decision ID --runtime opa` | equivalência dos casos entre a semântica de referência e o adapter OPA | equivalência para entradas fora dos casos declarados |
+| `prd conformance decision ID --runtime opa` | equivalência dos casos declarados entre a referência e o adapter OPA | semântica fora do subconjunto `dmn-table/v1` |
+| `prd conformance decision ID --runtime opa --parity` | paridade para chave extra/ausente, tipo, domínio, gap e overlap | conformidade DMN geral ou entradas arbitrárias |
 | `prd citations check` | estado dos blocos e snapshots conhecidos | autenticidade do autor |
 
 Ao adicionar um tipo ou alterar um contrato, atualize em conjunto o schema, o
@@ -48,17 +49,28 @@ runtime candidato sem mover a autoridade semântica para esse runtime.
 ```sh
 prd conformance decision DEC-001 --runtime reference
 prd conformance decision DEC-001 --runtime opa
+prd conformance decision DEC-001 --runtime opa --parity
 ```
 
 O adapter OPA compila somente o subconjunto já suportado: tabela `UNIQUE`,
 condições de igualdade, wildcard por condição omitida e saída escalar. Ele não
-expande o perfil DMN. O executável `opa` é opcional e não é baixado pelo pacote.
+executa o produto nem expande o perfil DMN. Antes de chamar o binário, o adapter
+aplica a mesma validação de nomes, tipos e domínios de entrada usada por
+`evaluateDecision()`. O Rego também emite esse contrato e estados distintos para
+`unique`, `gap`, `overlap` e `invalid_input`.
+
+Uma avaliação normal gera a policy uma vez e envia todos os casos em um único
+`opa eval`, limitado por `PRD_OPA_TIMEOUT_MS` (5 segundos por padrão). O resultado
+de conformidade registra a versão do binário. `--policy arquivo.rego` exige que o
+artefato informado seja idêntico ao gerador para a especificação principal;
+policies sintéticas das sondas de paridade continuam temporárias.
 
 ### Suíte OPA local e no GitHub Actions
 
-A política versionada em `opa/policies/dec_001.rego` é gerada a partir de
-`examples/transfer/product/decisions/DEC-001.yaml`. Para reproduzir a suíte do
-CI localmente, instale o executável `opa` no `PATH` e execute:
+A policy e o teste versionados em `opa/policies/` e `opa/tests/` são gerados a
+partir de `examples/transfer/product/decisions/DEC-001.yaml`. O sufixo hash do
+package impede que ids como `DEC-001` e `DEC_001` colidam. Para reproduzir a
+suíte do CI localmente, instale OPA 1.4.2 no `PATH` e execute:
 
 ```sh
 npm ci
@@ -70,9 +82,9 @@ npm run opa:conformance
 ```
 
 `opa:check` valida sintaxe estrita e formatação. `opa:test` executa os testes
-unitários Rego. `opa:server:test` inicia
-temporariamente `opa run --server`, aguarda o health check e valida os quatro
-casos pelo endpoint REST `/v1/data/prd/decision/dec_001/result`.
-`opa:conformance` exercita o adapter do CLI contra a mesma decisão. O job
-`OPA / Rego` também regenera a política e falha quando o arquivo versionado está
-desatualizado em relação ao YAML.
+Rego gerados, inclusive entradas inválidas. `opa:server:test` reserva uma porta
+local livre, inicia temporariamente `opa run --server` e deriva casos, endpoint e
+resultados esperados do mesmo YAML. `opa:conformance` usa a policy commitada para
+os casos principais, ativa `--parity` e ainda cobre números `0`, `-1`, decimal,
+inteiro acima de `2^53` e strings com aspas. GitHub Actions e Azure Pipelines
+instalam OPA 1.4.2, regeneram `opa/` e falham se qualquer artefato divergir.

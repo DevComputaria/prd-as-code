@@ -52,7 +52,8 @@
         "finite domain exhaustiveness up to 4096 combinations",
         "scenario-linked cases",
         "reference runtime conformance contract",
-        "optional OPA/Rego adapter for declared decision cases"
+        "optional OPA/Rego adapter for declared decision cases",
+        "OPA input, gap and overlap error parity probes"
       ],
       "unsupported": [
         "FEEL",
