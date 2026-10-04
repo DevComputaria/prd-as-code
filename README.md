@@ -66,7 +66,11 @@ npm exec --no -- prd validate --strict
 - `init` com agente, instruções, cinco templates de skills e workflow de CI para Copilot.
 - Migração aditiva do nosso protótipo anterior e CLI legado isolado.
 
-O runtime `reference` usa a semântica nativa de `evaluateDecision`; `--runtime opa` gera Rego temporário e requer o executável `opa` disponível no PATH (ou em `PRD_OPA_BINARY`). OPA é um runtime candidato de conformance, não a autoridade semântica do modelo.
+O runtime `reference` usa a semântica nativa de `evaluateDecision`; `--runtime
+opa` recompila somente o subconjunto `dmn-table/v1` em Rego e requer o executável
+`opa` no PATH (ou em `PRD_OPA_BINARY`). OPA é um candidato de conformidade, não
+executa o produto e não substitui a autoridade semântica do domínio. Use
+`--parity` para comparar também os contratos de entrada inválida, gap e overlap.
 
 A [matriz de capacidades](framework/capabilities.json) é o contrato de escopo. **Não há conformidade OMG completa, motor BPMN, FEEL, prova modal, execução de step definitions, servidor MCP ou autenticação de revisores nesta versão.**
 
@@ -118,7 +122,7 @@ Cenários Gherkin usam `SCN-...` e não duplicam um arquivo YAML de identidade. 
 | `test --require-tests --require-bound-scenarios` | Executa casos de decisões e exige vínculos de cenários |
 | `decision evaluate ID --input '{...}'` | Avalia uma tabela suportada |
 | `decision analyze ID` | Analisa domínios finitos |
-| `conformance decision ID --runtime reference|opa` | Compara um runtime executável com a semântica de referência |
+| `conformance decision ID --runtime reference\|opa [--parity] [--policy arquivo.rego]` | Compara casos e, opcionalmente, contratos de erro com a referência |
 | `cite ID --into notes/design.md` | Preserva snapshot e cita conteúdo |
 | `citations check`, `citations refresh arquivo.md` | Verifica ou atualiza citações intactas |
 | `change new SLUG --title MOTIVO` | Captura baseline |

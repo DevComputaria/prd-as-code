@@ -1,5 +1,7 @@
 trigger:
   - main
+variables:
+  OPA_VERSION: '1.4.2'
 pool:
   vmImage: ubuntu-latest
 steps:
@@ -14,5 +16,22 @@ steps:
     displayName: Unit, integration and legacy tests
   - script: npm run intent:validate && npm run intent:test
     displayName: Validate product example
+  - script: |
+      curl --fail --location --silent --show-error \
+        --output "$(Agent.TempDirectory)/opa" \
+        "https://openpolicyagent.org/downloads/v$(OPA_VERSION)/opa_linux_amd64_static"
+      chmod 0755 "$(Agent.TempDirectory)/opa"
+      echo "##vso[task.prependpath]$(Agent.TempDirectory)"
+    displayName: Install OPA $(OPA_VERSION)
+  - script: |
+      npm run opa:generate
+      git diff --exit-code -- opa
+      git ls-files --others --exclude-standard opa > "$(Agent.TempDirectory)/opa-untracked"
+      test ! -s "$(Agent.TempDirectory)/opa-untracked"
+      npm run opa:check
+      npm run opa:test
+      npm run opa:server:test
+      npm run opa:conformance
+    displayName: OPA generation, server and parity tests
   - script: npm pack
     displayName: Package CLI
