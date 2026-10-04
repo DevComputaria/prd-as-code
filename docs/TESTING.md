@@ -12,6 +12,7 @@
 | `npm test` | regressão automatizada do CLI, compilador e domínio | execução de uma aplicação externa |
 | `prd validate --strict` | schemas, referências e invariantes dos perfis | conformidade OMG completa |
 | `prd test` | resultados dos casos de decisões tipadas | execução dos passos Gherkin |
+| `prd conformance decision ID --runtime opa` | equivalência dos casos entre a semântica de referência e o adapter OPA | equivalência para entradas fora dos casos declarados |
 | `prd citations check` | estado dos blocos e snapshots conhecidos | autenticidade do autor |
 
 Ao adicionar um tipo ou alterar um contrato, atualize em conjunto o schema, o
@@ -36,3 +37,19 @@ O teste de distribuição deve usar um diretório fora do repositório de origem
 
 Isso detecta referências acidentais ao workspace de desenvolvimento que uma
 execução direta de `dist/` não detecta.
+
+
+## Conformidade de runtimes de decisão
+
+`evaluateDecision()` continua sendo a semântica de referência do perfil
+`dmn-table/v1`. A porta `DecisionRuntime` permite executar os mesmos casos em um
+runtime candidato sem mover a autoridade semântica para esse runtime.
+
+```sh
+prd conformance decision DEC-001 --runtime reference
+prd conformance decision DEC-001 --runtime opa
+```
+
+O adapter OPA compila somente o subconjunto já suportado: tabela `UNIQUE`,
+condições de igualdade, wildcard por condição omitida e saída escalar. Ele não
+expande o perfil DMN. O executável `opa` é opcional e não é baixado pelo pacote.
