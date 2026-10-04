@@ -15,7 +15,12 @@
     "demo": "npm run build && node scripts/demo.mjs",
     "prepack": "npm run build",
     "intent:validate": "node dist/interfaces/cli/main.js -C examples/transfer validate --strict",
-    "intent:test": "node dist/interfaces/cli/main.js -C examples/transfer test --require-tests"
+    "intent:test": "node dist/interfaces/cli/main.js -C examples/transfer test --require-tests",
+    "opa:generate": "npm run build && node scripts/generate-opa-policies.mjs",
+    "opa:check": "opa fmt --list --fail opa/policies opa/tests && opa check --strict opa/policies opa/tests",
+    "opa:test": "opa test opa/policies opa/tests --verbose",
+    "opa:server:test": "node scripts/test-opa-server.mjs",
+    "opa:conformance": "node dist/interfaces/cli/main.js -C examples/transfer conformance decision DEC-001 --runtime opa"
   },
   "dependencies": {
     "commander": "14.0.2", "yaml": "2.9.1", "ajv": "8.17.1",

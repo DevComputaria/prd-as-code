@@ -53,3 +53,26 @@ prd conformance decision DEC-001 --runtime opa
 O adapter OPA compila somente o subconjunto já suportado: tabela `UNIQUE`,
 condições de igualdade, wildcard por condição omitida e saída escalar. Ele não
 expande o perfil DMN. O executável `opa` é opcional e não é baixado pelo pacote.
+
+### Suíte OPA local e no GitHub Actions
+
+A política versionada em `opa/policies/dec_001.rego` é gerada a partir de
+`examples/transfer/product/decisions/DEC-001.yaml`. Para reproduzir a suíte do
+CI localmente, instale o executável `opa` no `PATH` e execute:
+
+```sh
+npm ci
+npm run opa:generate
+npm run opa:check
+npm run opa:test
+npm run opa:server:test
+npm run opa:conformance
+```
+
+`opa:check` valida sintaxe estrita e formatação. `opa:test` executa os testes
+unitários Rego. `opa:server:test` inicia
+temporariamente `opa run --server`, aguarda o health check e valida os quatro
+casos pelo endpoint REST `/v1/data/prd/decision/dec_001/result`.
+`opa:conformance` exercita o adapter do CLI contra a mesma decisão. O job
+`OPA / Rego` também regenera a política e falha quando o arquivo versionado está
+desatualizado em relação ao YAML.

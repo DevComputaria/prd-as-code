@@ -1,5 +1,9 @@
 name: CI
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 permissions:
   contents: read
 jobs:
@@ -20,3 +24,26 @@ jobs:
       - run: npm run intent:validate
       - run: npm run intent:test
       - run: npm pack
+
+  opa:
+    name: OPA / Rego
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.4.2
+      - run: npm ci
+      - run: npm run opa:generate
+      - name: Verify generated Rego is committed
+        run: |
+          git diff --exit-code -- opa/policies
+          test -z "$(git ls-files --others --exclude-standard opa/policies)"
+      - run: npm run opa:check
+      - run: npm run opa:test
+      - run: npm run opa:server:test
+      - run: npm run opa:conformance

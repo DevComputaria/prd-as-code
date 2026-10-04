@@ -56,7 +56,20 @@ test('rego generator preserves decision ids, values and wildcard rows', () => {
   const rego = generateDecisionRego('DEC-TEST', spec);
   assert.equal(opaPackageName('DEC-TEST'), 'prd.decision.dec_test');
   assert.match(rego, /package prd\.decision\.dec_test/);
-  assert.match(rego, /input\["active"\] == true/);
+  assert.match(rego, /input\.active == true/);
   assert.match(rego, /"ruleId": "allow"/);
   assert.match(rego, /count\(matches\) == 1/);
+});
+
+test('rego generator uses bracket notation for reserved Rego keywords', () => {
+  const keywordSpec = {
+    ...spec,
+    inputs: [{ name: 'if', type: 'boolean' }],
+    rules: [{ id: 'keyword', when: { if: true }, then: 'ALLOW' }],
+    cases: [{ id: 'C-KEYWORD', input: { if: true }, expected: 'ALLOW' }],
+  };
+
+  const rego = generateDecisionRego('DEC-KEYWORD', keywordSpec);
+  assert.match(rego, /input\["if"\] == true/);
+  assert.doesNotMatch(rego, /input\.if/);
 });
