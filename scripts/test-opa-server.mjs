@@ -70,6 +70,6 @@ try {
   server.kill('SIGTERM');
   await Promise.race([
     new Promise(resolveExit => server.once('exit', resolveExit)),
-    delay(2_000).then(() => server.kill('SIGKILL')),
+    delay(2_000, undefined, { ref: false }).then(() => server.kill('SIGKILL')),
   ]);
 }

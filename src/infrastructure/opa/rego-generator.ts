@@ -4,8 +4,26 @@ function scalar(value: Scalar): string {
   return JSON.stringify(value);
 }
 
+const regoKeywords = new Set([
+  'as',
+  'contains',
+  'default',
+  'else',
+  'every',
+  'false',
+  'if',
+  'import',
+  'in',
+  'not',
+  'null',
+  'package',
+  'some',
+  'true',
+  'with',
+]);
+
 function inputReference(name: string): string {
-  return /^[A-Za-z_][A-Za-z0-9_]*$/.test(name)
+  return /^[A-Za-z_][A-Za-z0-9_]*$/.test(name) && !regoKeywords.has(name)
     ? `input.${name}`
     : `input[${JSON.stringify(name)}]`;
 }
