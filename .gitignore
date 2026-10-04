@@ -4,3 +4,4 @@ dist/
 .intent/cache/
 .intent/write.lock
 coverage/
+reports/

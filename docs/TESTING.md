@@ -14,6 +14,8 @@
 | `prd test` | resultados dos casos de decisões tipadas | execução dos passos Gherkin |
 | `prd conformance decision ID --runtime opa` | equivalência dos casos declarados entre a referência e o adapter OPA | semântica fora do subconjunto `dmn-table/v1` |
 | `prd conformance decision ID --runtime opa --parity` | paridade para chave extra/ausente, tipo, domínio, gap e overlap | conformidade DMN geral ou entradas arbitrárias |
+| `npm run opa:report` | relatório JSON/Markdown da paridade entre a referência e o candidato OPA | execução do produto ou dos passos Gherkin |
+| `npm run features:test` | parsing Gherkin, identidade única `@scenario_SCN-...` e vínculo com casos de decisão | execução de step definitions ou da aplicação |
 | `prd citations check` | estado dos blocos e snapshots conhecidos | autenticidade do autor |
 
 Ao adicionar um tipo ou alterar um contrato, atualize em conjunto o schema, o
@@ -88,3 +90,10 @@ resultados esperados do mesmo YAML. `opa:conformance` usa a policy commitada par
 os casos principais, ativa `--parity` e ainda cobre números `0`, `-1`, decimal,
 inteiro acima de `2^53` e strings com aspas. GitHub Actions e Azure Pipelines
 instalam OPA 1.4.2, regeneram `opa/` e falham se qualquer artefato divergir.
+
+O job `OPA / Rego` também executa `npm run opa:report` e publica os arquivos JSON
+e Markdown como o artefato `opa-conformance-report`, inclusive quando o job falha.
+Uma action separada, `Features`, executa somente o parser oficial, exige exatamente
+uma tag `@scenario_SCN-...` por cenário e confirma os vínculos por meio de
+`prd test --require-bound-scenarios`. Ela publica `feature-binding-report`; nenhum
+step Gherkin ou código de aplicação é executado por essa verificação.

@@ -47,3 +47,12 @@ jobs:
       - run: npm run opa:test
       - run: npm run opa:server:test
       - run: npm run opa:conformance
+      - run: npm run opa:report
+        if: always()
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: opa-conformance-report
+          path: reports/opa
+          if-no-files-found: error
+          retention-days: 14
