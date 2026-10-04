@@ -56,7 +56,7 @@ test('rego generator preserves decision ids, values and wildcard rows', () => {
   const rego = generateDecisionRego('DEC-TEST', spec);
   assert.equal(opaPackageName('DEC-TEST'), 'prd.decision.dec_test');
   assert.match(rego, /package prd\.decision\.dec_test/);
-  assert.match(rego, /input\["active"\] == true/);
+  assert.match(rego, /input\.active == true/);
   assert.match(rego, /"ruleId": "allow"/);
   assert.match(rego, /count\(matches\) == 1/);
 });
