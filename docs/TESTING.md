@@ -93,6 +93,11 @@ instalam OPA 1.4.2, regeneram `opa/` e falham se qualquer artefato divergir.
 
 O job `OPA / Rego` também executa `npm run opa:report` e publica os arquivos JSON
 e Markdown como o artefato `opa-conformance-report`, inclusive quando o job falha.
+O relatório enriquece regras, casos e cenários somente com comentários adjacentes
+nas formas `# decision ID:`, `# rule ID:`, `# case ID:` e `# scenario ID:`;
+comentários livres não são interpretados como metadados. Para probes de paridade,
+o próprio script descreve o contrato provado e mostra o código devolvido em
+“Observado”, mesmo quando o caso passa.
 Uma action separada, `Features`, executa somente o parser oficial, exige exatamente
 uma tag `@scenario_SCN-...` por cenário e confirma os vínculos por meio de
 `prd test --require-bound-scenarios`. Ela publica `feature-binding-report`; nenhum
