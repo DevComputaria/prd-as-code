@@ -1,3 +1,4 @@
+# decision DEC-001: elegibilidade didática. Conta inativa basta para recusar; saldo só importa com conta ativa.
 apiVersion: prd.devcomputaria/v1alpha1
 kind: Decision
 metadata:
@@ -20,39 +21,46 @@ spec:
     - CONTA_INATIVA
     - SALDO_INSUFICIENTE
   rules:
+  # rule DROW-001: coringa de saldo. contaAtiva false cobre os dois valores de saldoSuficiente.
   - id: DROW-001
     when:
       contaAtiva: false
     then: CONTA_INATIVA
+  # rule DROW-002: conta ativa e saldo insuficiente. Não cobre conta inativa.
   - id: DROW-002
     when:
       contaAtiva: true
       saldoSuficiente: false
     then: SALDO_INSUFICIENTE
+  # rule DROW-003: única linha de aceite. As duas condições são exigidas.
   - id: DROW-003
     when:
       contaAtiva: true
       saldoSuficiente: true
     then: ELEGIVEL
   cases:
+  # case CASE-001: caminho feliz. Vincula SCN-001 e deve disparar só DROW-003.
   - id: CASE-001
     scenario: SCN-001
     input:
       contaAtiva: true
       saldoSuficiente: true
     expected: ELEGIVEL
+  # case CASE-002: conta inativa com saldo. O saldo não muda o resultado; dispara DROW-001.
   - id: CASE-002
     scenario: SCN-002
     input:
       contaAtiva: false
       saldoSuficiente: true
     expected: CONTA_INATIVA
+  # case CASE-003: conta ativa sem saldo. Dispara DROW-002, não a linha coringa.
   - id: CASE-003
     scenario: SCN-003
     input:
       contaAtiva: true
       saldoSuficiente: false
     expected: SALDO_INSUFICIENTE
+  # case CASE-004: segundo ponto do coringa. Sem cenário Gherkin; prova que saldo false também cai em DROW-001.
   - id: CASE-004
     input:
       contaAtiva: false
