@@ -72,6 +72,38 @@
         {
           "type": "object",
           "properties": {
+            "and": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/expression"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "and"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "or": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/expression"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "or"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
             "implies": {
               "type": "object",
               "properties": {
@@ -750,22 +782,70 @@
                   ]
                 },
                 "forEach": {
-                  "type": "object",
-                  "properties": {
-                    "variable": {
-                      "type": "string",
-                      "minLength": 1
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "variable": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "conceptRef": {
+                          "type": "string",
+                          "pattern": "^[A-Z][A-Z0-9]*-[A-Za-z0-9][A-Za-z0-9-]*$"
+                        }
+                      },
+                      "required": [
+                        "variable",
+                        "conceptRef"
+                      ],
+                      "additionalProperties": false
                     },
-                    "conceptRef": {
-                      "type": "string",
-                      "pattern": "^[A-Z][A-Z0-9]*-[A-Za-z0-9][A-Za-z0-9-]*$"
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "variable": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "conceptRef": {
+                            "type": "string",
+                            "pattern": "^[A-Z][A-Z0-9]*-[A-Za-z0-9][A-Za-z0-9-]*$"
+                          }
+                        },
+                        "required": [
+                          "variable",
+                          "conceptRef"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 1
                     }
+                  ]
+                },
+                "quantifiers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "variable": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "conceptRef": {
+                        "type": "string",
+                        "pattern": "^[A-Z][A-Z0-9]*-[A-Za-z0-9][A-Za-z0-9-]*$"
+                      }
+                    },
+                    "required": [
+                      "variable",
+                      "conceptRef"
+                    ],
+                    "additionalProperties": false
                   },
-                  "required": [
-                    "variable",
-                    "conceptRef"
-                  ],
-                  "additionalProperties": false
+                  "minItems": 1
                 },
                 "assertion": {
                   "$ref": "#/$defs/expression"
@@ -773,7 +853,6 @@
               },
               "required": [
                 "modality",
-                "forEach",
                 "assertion"
               ],
               "additionalProperties": false

@@ -8,13 +8,14 @@ ref={'type':'string','pattern':'^[A-Z][A-Z0-9]*-[A-Za-z0-9][A-Za-z0-9-]*(#[A-Za-
 scalar={'type':['string','number','boolean']};scalar_map={'type':'object','additionalProperties':scalar}
 def const(v):return {'const':v}
 link=obj({'relation':{'enum':['uses','depends-on','governed-by','performed-by','defines','satisfies','verifies','contains','related-to','realized-by','derived-from']},'target':ref})
-expr={'oneOf':[obj({'factRef':ident,'bindings':{'type':'object','additionalProperties':s}}),obj({'not':{'$ref':'#/$defs/expression'}}),obj({'all':arr({'$ref':'#/$defs/expression'},1)}),obj({'any':arr({'$ref':'#/$defs/expression'},1)}),obj({'implies':obj({'if':{'$ref':'#/$defs/expression'},'then':{'$ref':'#/$defs/expression'}})})]}
+expr={'oneOf':[obj({'factRef':ident,'bindings':{'type':'object','additionalProperties':s}}),obj({'not':{'$ref':'#/$defs/expression'}}),obj({'all':arr({'$ref':'#/$defs/expression'},1)}),obj({'any':arr({'$ref':'#/$defs/expression'},1)}),obj({'and':arr({'$ref':'#/$defs/expression'},1)}),obj({'or':arr({'$ref':'#/$defs/expression'},1)}),obj({'implies':obj({'if':{'$ref':'#/$defs/expression'},'then':{'$ref':'#/$defs/expression'}})})]}
 variable=obj({'name':s,'type':{'enum':['boolean','number','string']},'values':dict(arr(scalar,1),uniqueItems=True)},['name','type'])
 plain=obj({'profile':const('product-core/v1'),'description':s})
 specs={k:plain for k in ['Actor','Journey','UseCase','BoundedContext']}
 specs['Term']=obj({'profile':const('sbvr-core/v1'),'definition':s,'designations':arr(s,1)},['profile','definition'])
 specs['FactType']=obj({'profile':const('sbvr-core/v1'),'reading':s,'roles':arr(obj({'name':s,'conceptRef':ident}),1)})
-specs['BusinessRule']=obj({'profile':const('sbvr-core/v1'),'statement':s,'formulation':obj({'modality':{'enum':['necessity','obligation','prohibition','permission']},'forEach':obj({'variable':s,'conceptRef':ident}),'assertion':{'$ref':'#/$defs/expression'}})},['profile','statement'])
+quantifier=obj({'variable':s,'conceptRef':ident})
+specs['BusinessRule']=obj({'profile':const('sbvr-core/v1'),'statement':s,'formulation':obj({'modality':{'enum':['necessity','obligation','prohibition','permission']},'forEach':{'oneOf':[quantifier,arr(quantifier,1)]},'quantifiers':arr(quantifier,1),'assertion':{'$ref':'#/$defs/expression'}},['modality','assertion'])},['profile','statement'])
 specs['Requirement']=obj({'profile':const('reqif-core/v1'),'category':{'enum':['functional','quality','constraint']},'statement':s,'acceptance':arr(s,1),'parentRef':ident,'attributes':scalar_map,'externalRefs':arr(obj({'system':s,'identifier':s}))},['profile','category','statement','acceptance'])
 specs['Decision']=obj({'profile':const('dmn-table/v1'),'hitPolicy':const('UNIQUE'),'inputs':arr(variable,1),'output':variable,'rules':arr(obj({'id':s,'when':scalar_map,'then':scalar}),1),'cases':arr(obj({'id':s,'scenario':ident,'input':scalar_map,'expected':scalar},['id','input','expected']))})
 node=obj({'id':s,'type':{'enum':['startEvent','endEvent','task','businessRuleTask','exclusiveGateway']},'title':s,'decisionRef':ident},['id','type'])
