@@ -71,3 +71,77 @@ test('Decision evaluator handles non-finite numbers appropriately',t=>{
   assert.throws(()=>evaluateDecision(d,{contaAtiva:true,saldoSuficiente:NaN}),code('INVALID_INPUT'));
   assert.throws(()=>evaluateDecision(d,{contaAtiva:true,saldoSuficiente:Infinity}),code('INVALID_INPUT'));
 });
+
+test('Scenario Outlines generate row-level scenarios with replaced variable placeholders',t=>{
+  const s=fixture(t);
+  const f=s.workspace.productFiles().find(f=>f.path.endsWith('.feature'));
+  const outlineContent = `# language: pt
+@process_PROC-001
+Funcionalidade: Teste Outline
+
+  @scenario_SCN-099
+  Esquema do Cenário: Transferência com valor <valor>
+    Dado que a conta possui saldo <saldo>
+    Quando transfiro <valor>
+    Então a operação deve ser <resultado>
+
+    Exemplos:
+      | saldo | valor | resultado |
+      | 100   | 50    | APROVADA  |
+      | 10    | 50    | RECUSADA  |
+`;
+  s.workspace.write(f.path, outlineContent);
+  const m=s.compile();
+  assert.ok(m.scenarios.some(sc=>sc.id==='SCN-099#1' && sc.steps.some(st=>st.includes('saldo 100'))));
+  assert.ok(m.scenarios.some(sc=>sc.id==='SCN-099#2' && sc.steps.some(st=>st.includes('saldo 10'))));
+});
+
+test('Schema validation diagnostics include exact line numbers in YAML files',t=>{
+  const s=fixture(t);
+  const a=source(s, 'BR-001');
+  const invalidContent = `apiVersion: prd.devcomputaria/v1alpha1
+kind: BusinessRule
+metadata:
+  id: BR-001
+  title: Regra de Elegibilidade
+  status: active
+spec:
+  profile: sbvr-core/v1
+  statement: Elegibilidade
+  formulation:
+    modality: INVALID_MODALITY
+    forEach:
+      variable: c
+      conceptRef: TERM-001
+    assertion:
+      factRef: FACT-001
+      bindings:
+        conta: c
+`;
+  s.workspace.write(a.path, invalidContent);
+  const res = s.validate();
+  assert.equal(res.valid, false);
+  const diag = res.model.diagnostics.find(d=>d.code==='SCHEMA_INVALID');
+  assert.ok(diag && diag.line === 11, `Expected line 11, got ${diag?.line}`);
+});
+
+test('SBVR formulation accepts multiple quantifiers and logical AND/OR expressions',t=>{
+  const s=fixture(t);
+  const a=source(s, 'BR-001');
+  const doc = structuredClone(a.artifact);
+  doc.spec.formulation = {
+    modality: 'necessity',
+    quantifiers: [
+      { variable: 'c', conceptRef: 'TERM-001' },
+      { variable: 'a', conceptRef: 'TERM-001' }
+    ],
+    assertion: {
+      and: [
+        { factRef: 'FACT-001', bindings: { transfer: 'c' } },
+        { factRef: 'FACT-001', bindings: { transfer: 'a' } }
+      ]
+    }
+  };
+  s.workspace.write(a.path, stringify(doc));
+  assert.equal(s.validate().valid, true);
+});

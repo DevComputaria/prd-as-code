@@ -37,8 +37,14 @@ export function inspectSemantics(sources: SourceArtifact[], scenarios: Scenario[
     if (a.kind === 'BusinessRule') {
       if (!isRecord(spec.formulation)) issue('NARRATIVE_RULE', 'Narrative-only rule: no structured formulation to type-check.', s, 'unsupported');
       else {
-        const f = spec.formulation, q = f.forEach as { variable: string; conceptRef: string };
-        reference(s, q.conceptRef, 'quantifies', ['Term']);
+        const f = spec.formulation;
+        const quantifiersList: { variable: string; conceptRef: string }[] = [];
+        if (Array.isArray(f.quantifiers)) quantifiersList.push(...(f.quantifiers as { variable: string; conceptRef: string }[]));
+        if (Array.isArray(f.forEach)) quantifiersList.push(...(f.forEach as { variable: string; conceptRef: string }[]));
+        else if (isRecord(f.forEach)) quantifiersList.push(f.forEach as unknown as { variable: string; conceptRef: string });
+
+        for (const q of quantifiersList) reference(s, q.conceptRef, 'quantifies', ['Term']);
+
         function expression(e: unknown) {
           if (!isRecord(e)) return;
           if (typeof e.factRef === 'string') {
@@ -46,7 +52,10 @@ export function inspectSemantics(sources: SourceArtifact[], scenarios: Scenario[
             const fact = byId.get(e.factRef), bindings = e.bindings as Record<string, string>;
             if (fact?.artifact.kind === 'FactType') {
               const roles = fact.artifact.spec.roles as { name: string; conceptRef: string }[];
-              if (Object.keys(bindings).length !== roles.length || roles.some(r => bindings[r.name] !== q.variable || r.conceptRef !== q.conceptRef)) issue('BINDING_TYPE', 'Bindings must supply every fact role with the declared variable of matching concept type.', s);
+              if (Object.keys(bindings).length !== roles.length || roles.some(r => {
+                const boundVar = bindings[r.name];
+                return !quantifiersList.some(q => q.variable === boundVar && q.conceptRef === r.conceptRef);
+              })) issue('BINDING_TYPE', 'Bindings must supply every fact role with a declared variable of matching concept type.', s);
             }
           }
           for (const value of Object.values(e)) if (Array.isArray(value)) value.forEach(expression); else if (isRecord(value)) expression(value);

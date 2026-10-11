@@ -1,6 +1,6 @@
 import { digest } from '../domain/digest.js';
 import { Ajv } from 'ajv';
-import { parseDocument } from 'yaml';
+import { parseDocument, LineCounter } from 'yaml';
 import { Parser, AstBuilder, GherkinClassicTokenMatcher } from '@cucumber/gherkin';
 import { IdGenerator } from '@cucumber/messages';
 import type { FeatureChild, RuleChild, Tag } from '@cucumber/messages';
@@ -8,10 +8,22 @@ import { canonical, isRecord, sortedJson } from '../domain/model.js';
 import type { Artifact, Diagnostic, Model, Scenario, SourceArtifact, SourceFile } from '../domain/model.js';
 import { inspectSemantics } from './semantics.js';
 import type { Compiler } from '../application/ports/compiler.js';
+
+export function parseYamlDocument(text: string) {
+  const lineCounter = new LineCounter();
+  const doc = parseDocument(text.replace(/\r\n?/g, '\n'), { uniqueKeys: true, strict: true, lineCounter });
+  if (doc.errors.length || doc.warnings.length) {
+    const err = [...doc.errors, ...doc.warnings][0]!;
+    const line = err.linePos?.[0]?.line;
+    const error = new Error(err.message) as Error & { line?: number };
+    if (line) error.line = line;
+    throw error;
+  }
+  return { value: doc.toJS({ maxAliasCount: 0 }), doc, lineCounter };
+}
+
 export function yaml(text: string): unknown {
-  const doc = parseDocument(text.replace(/\r\n?/g, '\n'), { uniqueKeys: true, strict: true });
-  if (doc.errors.length || doc.warnings.length) throw new Error([...doc.errors, ...doc.warnings].map(e => e.message).join('; '));
-  return doc.toJS({ maxAliasCount: 0 });
+  return parseYamlDocument(text).value;
 }
 export function createCompiler(schemas: Record<string, object>): Compiler {
   const ajv = new Ajv({ allErrors: true, strict: false, allowUnionTypes: true });
@@ -31,8 +43,25 @@ export function createCompiler(schemas: Record<string, object>): Compiler {
                 const s = child.scenario, tags = [...inherited, ...s.tags].map(t => t.name);
                 const ids = tags.filter(t => t.startsWith('@scenario_'));
                 if (ids.length !== 1 || !/^@scenario_SCN-[A-Za-z0-9][A-Za-z0-9-]*$/.test(ids[0]!)) throw new Error(`Scenario at line ${s.location.line} requires exactly one @scenario_SCN-... tag.`);
-                scenarios.push({ id: ids[0]!.slice(10), name: s.name, file: file.path, line: s.location.line, tags, steps: [...background, ...localBackground, ...s.steps.map(x => x.text)] });
-                if (s.examples.length) diagnostics.push({ code: 'GHERKIN_OUTLINE_NOT_BOUND', severity: 'unsupported', file: file.path, line: s.location.line, message: 'Scenario Outline is parsed but row-level execution bindings are not implemented in v0.2.' });
+                const baseId = ids[0]!.slice(10);
+                const baseSteps = [...background, ...localBackground, ...s.steps.map(x => x.text)];
+                scenarios.push({ id: baseId, name: s.name, file: file.path, line: s.location.line, tags, steps: baseSteps });
+                if (s.examples.length) {
+                  let rowNum = 1;
+                  for (const example of s.examples) {
+                    const headers = example.tableHeader?.cells.map(c => c.value) ?? [];
+                    for (const row of example.tableBody) {
+                      const values = row.cells.map(c => c.value);
+                      const rowSteps = [...background, ...localBackground, ...s.steps.map(x => {
+                        let text = x.text;
+                        headers.forEach((h, i) => { if (values[i] !== undefined) text = text.replace(new RegExp(`<${h}>`, 'g'), values[i]!); });
+                        return text;
+                      })];
+                      scenarios.push({ id: `${baseId}#${rowNum}`, name: `${s.name} (Row ${rowNum})`, file: file.path, line: row.location.line, tags, steps: rowSteps });
+                      rowNum++;
+                    }
+                  }
+                }
               }
             }
           }
@@ -40,16 +69,30 @@ export function createCompiler(schemas: Record<string, object>): Compiler {
           continue;
         }
         const normalized = file.text.replace(/\r\n?/g, '\n').replace(/^\uFEFF/, '');
-        let value: unknown, body: string | undefined;
+        let value: unknown, body: string | undefined, parsedDoc: ReturnType<typeof parseYamlDocument> | undefined, lineOffset = 0;
         if (file.path.endsWith('.md')) {
           const m = /^---\n([\s\S]*?)\n---(?:\n|$)([\s\S]*)$/.exec(normalized);
           if (!m) throw new Error('Product Markdown requires artifact front matter. Keep supporting docs outside product/.');
-          value = yaml(m[1]!); body = m[2]!.replace(/^\n+|\n+$/g, '');
-        } else value = yaml(normalized);
+          parsedDoc = parseYamlDocument(m[1]!);
+          value = parsedDoc.value; body = m[2]!.replace(/^\n+|\n+$/g, '');
+          lineOffset = 1; // Front matter begins after the opening '---' at line 1
+        } else {
+          parsedDoc = parseYamlDocument(normalized);
+          value = parsedDoc.value;
+        }
         const validator = isRecord(value) && typeof value.kind === 'string' ? validators.get(value.kind) : undefined;
         if (!validator) throw new Error('Unknown or missing artifact kind. See framework/schemas/.');
         if (!validator(value)) {
-          for (const e of validator.errors ?? []) diagnostics.push({ code: 'SCHEMA_INVALID', severity: 'error', file: file.path, path: e.instancePath || '/', message: e.message ?? 'Invalid schema' });
+          for (const e of validator.errors ?? []) {
+            let line: number | undefined;
+            if (parsedDoc) {
+              const segments = e.instancePath.split('/').filter(Boolean).map(p => /^\d+$/.test(p) ? Number(p) : p);
+              let node = parsedDoc.doc.getIn(segments, true) as { range?: [number, number] } | null;
+              if (!node && segments.length) node = parsedDoc.doc.getIn(segments.slice(0, -1), true) as { range?: [number, number] } | null;
+              if (node?.range) line = parsedDoc.lineCounter.linePos(node.range[0]).line + lineOffset;
+            }
+            diagnostics.push({ code: 'SCHEMA_INVALID', severity: 'error', file: file.path, line, path: e.instancePath || '/', message: e.message ?? 'Invalid schema' });
+          }
           continue;
         }
         const source = { artifact: value as Artifact, path: file.path, body, digest: '' };
