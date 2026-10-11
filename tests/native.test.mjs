@@ -44,3 +44,30 @@ test('CLI usage errors are structured JSON with exit 2',()=>{const r=spawnSync(p
 test('legacy subcommand passes through root and flags',t=>{const root=mkdtempSync(join(tmpdir(),'intent-legacy-cli-'));t.after(()=>rmSync(root,{recursive:true,force:true}));legacyInit(root,'Legacy');const r=spawnSync(process.execPath,[cli,'-C',root,'legacy','validate','--json'],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);assert.doesNotThrow(()=>JSON.parse(r.stdout));});
 test('candidate cases block approval and apply even when the structural model is valid',t=>{const s=fixture(t),a=source(s,'DEC-001'),d=structuredClone(a.artifact);d.spec.cases[0].expected='CONTA_INATIVA';s.createChange('bad-case','Wrong expectation');s.stage('bad-case',a.path,stringify(d));assert.equal(s.candidate('bad-case').model.diagnostics.length,0);assert.throws(()=>s.approve('bad-case','Reviewer'),code('DECISION_TEST_FAILED'));assert.equal(s.readChange('bad-case').state,'draft');});
 test('generated Copilot skill metadata and relative documentation links resolve',t=>{const s=fixture(t);for(const name of ['product-discover','product-behavior','product-process','product-specify','product-review']){const path=join(s.workspace.root,'.github/skills',name,'SKILL.md');const text=readFileSync(path,'utf8');const meta=parse(text.split('---')[1]);assert.equal(meta.name,name);assert.ok(meta.description);for(const [,link] of text.matchAll(/\]\((\.\.\/[^)]+)\)/g))assert.ok(existsSync(resolve(path,'..',link)),link);}});
+
+test('Gherkin scenario tag validation fails when tags are missing, duplicated, or malformed',t=>{
+  const s=fixture(t);
+  const f=s.workspace.productFiles().find(f=>f.path.endsWith('.feature'));
+
+  // Malformed scenario ID tag
+  s.workspace.write(f.path, f.text.replace('@scenario_SCN-001', '@scenario_123'));
+  assert.equal(s.validate().valid, false);
+
+  // Duplicate @scenario_ tags on a single scenario
+  s.workspace.write(f.path, f.text.replace('@scenario_SCN-001', '@scenario_SCN-001 @scenario_SCN-002'));
+  assert.equal(s.validate().valid, false);
+});
+
+test('UTF-8 BOM in YAML product files is stripped and parsed correctly',t=>{
+  const s=fixture(t);
+  const a=source(s, 'BR-001');
+  const bomText = '\uFEFF' + s.workspace.read(a.path);
+  s.workspace.write(a.path, bomText);
+  assert.equal(s.validate().valid, true);
+});
+
+test('Decision evaluator handles non-finite numbers appropriately',t=>{
+  const d=source(fixture(t),'DEC-001').artifact.spec;
+  assert.throws(()=>evaluateDecision(d,{contaAtiva:true,saldoSuficiente:NaN}),code('INVALID_INPUT'));
+  assert.throws(()=>evaluateDecision(d,{contaAtiva:true,saldoSuficiente:Infinity}),code('INVALID_INPUT'));
+});
